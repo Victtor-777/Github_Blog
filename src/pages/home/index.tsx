@@ -40,7 +40,7 @@ export function Home() {
 
   useEffect(() => {
     getPosts();
-  }, []);
+  }, [getPosts]);
 
   return (
     <div>

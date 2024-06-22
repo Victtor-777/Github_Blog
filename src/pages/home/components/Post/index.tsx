@@ -1,4 +1,5 @@
 import { IPost } from "../..";
+import { relativeDateFormatter } from "../../../../utils/formatter";
 import { PostContainer } from "./styles";
 
 interface PostProps {
@@ -6,11 +7,13 @@ interface PostProps {
 }
 
 export function Post({ post }: PostProps) {
+  const formattedDate = relativeDateFormatter(post.create_at);
+
   return (
     <PostContainer to={`/post/${post.number}`}>
       <div>
         <strong>{post.title}</strong>
-        <span>{post.create_at}</span>
+        <span>{formattedDate}</span>
       </div>
       <p>{post.body}</p>
     </PostContainer>
