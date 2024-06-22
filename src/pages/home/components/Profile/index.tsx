@@ -3,38 +3,69 @@ import { ExternalLink } from "../../../../components/ExternalLink";
 import { ProfileContainer, ProfileDetails, ProfilePicture } from "./styles";
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
 import { faBuilding, faUserGroup } from "@fortawesome/free-solid-svg-icons";
+import { useCallback, useEffect, useState } from "react";
+import { api } from "../../../../lib/axios";
+
+const username = import.meta.env.VITE_GITHUB_USERNAME;
+
+interface ProfileData {
+  login: string;
+  bio: string;
+  avatar_url: string;
+  html_url: string;
+  name: string;
+  company?: string;
+  followers: number;
+}
 
 export function Profile() {
+  const [profileData, setProfileData] = useState<ProfileData>(
+    {} as ProfileData
+  );
+  const [isLoading, setIsLoading] = useState(true);
+
+  const getProfileData = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const response = await api.get(`/users/${username}`);
+      setProfileData(response.data);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    getProfileData();
+  }, [getProfileData]);
+
   return (
     <ProfileContainer>
-      <ProfilePicture src="https://github.com/Victtor-777.png" />
+      <ProfilePicture src={profileData.avatar_url} />
 
       <ProfileDetails>
         <header>
-          <h1>Victtor Guilherme</h1>
+          <h1>{profileData.name}</h1>
 
           <ExternalLink
             text="Github"
             target="_blank"
-            href="https://github.com/Victtor-777"
+            href={profileData.html_url}
           />
         </header>
-        <p>
-          Engenheiro de Software dedicado ao aprendizado constante. Atualmente,
-          mergulhando nos estudos de TypeScript, Next.js e Node.js.
-        </p>
+        <p>{profileData.bio}</p>
         <ul>
           <li>
             <FontAwesomeIcon icon={faGithub} />
-            Victtor-777
+            {profileData.login}
           </li>
-          <li>
-            <FontAwesomeIcon icon={faBuilding} />
-            Freelancer
-          </li>
+          {profileData?.company && (
+            <li>
+              <FontAwesomeIcon icon={faBuilding} />
+            </li>
+          )}
           <li>
             <FontAwesomeIcon icon={faUserGroup} />
-            123 seguidores
+            {profileData.followers}
           </li>
         </ul>
       </ProfileDetails>
